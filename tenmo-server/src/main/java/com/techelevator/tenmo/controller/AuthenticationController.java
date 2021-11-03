@@ -51,6 +51,8 @@ public class AuthenticationController {
         return new LoginResponse(jwt, user);
     }
 
+
+
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public void register(@Valid @RequestBody RegisterUserDTO newUser) {
