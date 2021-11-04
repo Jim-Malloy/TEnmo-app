@@ -1,11 +1,13 @@
 package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.AccountDao;
+import com.techelevator.tenmo.dao.TransferDao;
+import com.techelevator.tenmo.dao.UserDao;
 import com.techelevator.tenmo.model.Account;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.TransferStatus;
+import com.techelevator.tenmo.model.User;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,9 +16,13 @@ import java.util.List;
 public class AccountController {
 
     private AccountDao dao;
+    private TransferDao transferDao;
+    private UserDao userDao;
 
-    public AccountController(AccountDao dao) {
+    public AccountController(AccountDao dao, TransferDao transferDao, UserDao userDao) {
         this.dao = dao;
+        this.transferDao = transferDao;
+        this.userDao = userDao;
     }
 
     @RequestMapping(path = "/accounts", method = RequestMethod.GET)
@@ -27,5 +33,15 @@ public class AccountController {
     @RequestMapping(path = "/accounts/{userId}", method = RequestMethod.GET)
     public Account getAccount(@PathVariable Long userId) {
         return dao.getAccount(userId);
+    }
+
+    @RequestMapping(path = "/transfer", method = RequestMethod.POST)
+    public Transfer createTransfer(@RequestBody Transfer newTransfer) {
+        return transferDao.create(newTransfer);
+    }
+
+    @RequestMapping(path = "/users", method = RequestMethod.GET)
+    public List<User> userList() {
+        return userDao.findAll();
     }
 }

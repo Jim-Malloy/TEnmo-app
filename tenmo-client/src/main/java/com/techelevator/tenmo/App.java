@@ -2,11 +2,14 @@ package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.AuthenticationServiceException;
 import com.techelevator.view.ConsoleService;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 
 public class App {
@@ -90,7 +93,18 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 
 	private void sendBucks() {
 		// TODO Auto-generated method stub
-		
+		System.out.println("--------------------");
+		System.out.println("Users ID      Name ");
+		System.out.println("--------------------");
+		User[] users = restTemplate.getForObject(API_BASE_URL + "users", User[].class);
+
+		if(users != null) {
+			for (User newUser : users) {
+				System.out.println(newUser.getId() + "           " + newUser.getUsername());
+			}
+		}
+		System.out.println("---------");
+
 	}
 
 	private void requestBucks() {
