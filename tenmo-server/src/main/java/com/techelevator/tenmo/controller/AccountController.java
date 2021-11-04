@@ -44,4 +44,10 @@ public class AccountController {
     public List<User> userList() {
         return userDao.findAll();
     }
+
+    @RequestMapping(path = "/accounts/{fromId}", method = RequestMethod.PUT)
+    public void update(@RequestBody Account updatedAccount, @PathVariable long fromId) {
+        dao.update(updatedAccount, fromId);
+    }
+
 }

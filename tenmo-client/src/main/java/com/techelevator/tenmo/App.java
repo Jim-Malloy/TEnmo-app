@@ -1,15 +1,17 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.AuthenticationServiceException;
 import com.techelevator.view.ConsoleService;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 
 public class App {
@@ -77,8 +79,14 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 
 	private void viewCurrentBalance() {
 		// TODO Auto-generated method stub
-		Account account = restTemplate.getForObject(API_BASE_URL + "accounts/" + currentUser.getUser().getId(), Account.class);
-		System.out.println("Your current account balance is: $" + account.getBalance());
+		try {
+			Account account = restTemplate.getForObject(API_BASE_URL + "accounts/" +
+					currentUser.getUser().getId(), Account.class);
+			System.out.println("Your current account balance is: $" + account.getBalance());
+		} catch (RestClientResponseException | ResourceAccessException ex) {
+			System.out.println("An error occurred!");
+		}
+
 	}
 
 	private void viewTransferHistory() {
@@ -96,14 +104,63 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		System.out.println("--------------------");
 		System.out.println("Users ID      Name ");
 		System.out.println("--------------------");
-		User[] users = restTemplate.getForObject(API_BASE_URL + "users", User[].class);
+		User[] users = null;
 
-		if(users != null) {
+		try {
+			users = restTemplate.getForObject(API_BASE_URL + "users", User[].class);
+
 			for (User newUser : users) {
-				System.out.println(newUser.getId() + "           " + newUser.getUsername());
+				if (!newUser.getUsername().equals(currentUser.getUser().getUsername())) {
+					System.out.println(newUser.getId() + "          " + newUser.getUsername());
+				}
 			}
+		} catch (RestClientResponseException | ResourceAccessException ex) {
+			System.out.println("An error occurred!");
 		}
+
 		System.out.println("---------");
+		System.out.println();
+
+		Integer toUserId =  console.getUserIdInput();
+		double amount = console.getAmountInput();
+
+		try {
+			Account fromAccount = restTemplate.getForObject(API_BASE_URL + "accounts/" +
+					currentUser.getUser().getId(), Account.class);
+
+			if (fromAccount != null && fromAccount.getBalance() >= amount) {
+				fromAccount.setBalance(fromAccount.getBalance() - amount);
+			}
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			HttpEntity<Account> entity = new HttpEntity<>(fromAccount, headers);
+
+			restTemplate.put(API_BASE_URL + "accounts/" + currentUser.getUser().getId(), entity);
+
+			Account toAccount = restTemplate.getForObject(API_BASE_URL + "accounts/" + toUserId, Account.class);
+
+			if (toAccount != null) {
+				toAccount.setBalance(toAccount.getBalance() + amount);
+			}
+
+			entity = new HttpEntity<>(toAccount, headers);
+
+			restTemplate.put(API_BASE_URL + "accounts/" + toUserId, entity);
+
+			Transfer newTransfer = new Transfer();
+			newTransfer.setTransferTypeId(2);
+			newTransfer.setTransferStatusId(2);
+			newTransfer.setAccountFrom(fromAccount.getAccountId());
+			newTransfer.setAccountTo(toAccount.getAccountId());
+			newTransfer.setAmount(amount);
+
+			HttpEntity<Transfer> newEntity = new HttpEntity<>(newTransfer, headers);
+			restTemplate.postForObject(API_BASE_URL + "transfer", newEntity, Transfer.class);
+
+		} catch (RestClientResponseException | ResourceAccessException ex) {
+			System.out.println("An error occurred!");
+		}
 
 	}
 

@@ -4,6 +4,8 @@ package com.techelevator.view;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Scanner;
 
 public class ConsoleService {
@@ -72,5 +74,30 @@ public class ConsoleService {
 			}
 		} while(result == null);
 		return result;
+	}
+
+	public Integer getUserIdInput() {
+		System.out.print("Enter ID of user you are sending to (0 to cancel): ");
+		String id = in.nextLine();
+		Integer userId = null;
+		try {
+			userId = Integer.parseInt(id);
+		} catch (NumberFormatException ex) {
+			out.println(System.lineSeparator() + "*** " + userId + " is not valid ***" + System.lineSeparator());
+		}
+
+		return userId;
+	}
+
+	public Double getAmountInput() {
+		System.out.print("Enter amount: ");
+		String input = in.nextLine();
+		Double amount = null;
+		try {
+			amount = Double.parseDouble(input);
+		} catch (NumberFormatException ex) {
+			out.println(System.lineSeparator() + "*** " + amount + " is not valid ***" + System.lineSeparator());
+		}
+		return amount;
 	}
 }
