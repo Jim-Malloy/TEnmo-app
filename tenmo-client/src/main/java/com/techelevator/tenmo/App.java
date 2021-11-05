@@ -91,6 +91,12 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
+		System.out.println("-------------------------------------------");
+		System.out.println("Transfers ID  From/To          Amount");
+		System.out.println("-------------------------------------------");
+		Transfer transfer = restTemplate.getForObject(API_BASE_URL + "send?username=" +
+				currentUser.getUser().getUsername(), Transfer.class);
+
 		
 	}
 

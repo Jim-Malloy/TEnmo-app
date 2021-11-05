@@ -16,12 +16,10 @@ import java.util.List;
 public class AccountController {
 
     private AccountDao dao;
-    private TransferDao transferDao;
     private UserDao userDao;
 
-    public AccountController(AccountDao dao, TransferDao transferDao, UserDao userDao) {
+    public AccountController(AccountDao dao, UserDao userDao) {
         this.dao = dao;
-        this.transferDao = transferDao;
         this.userDao = userDao;
     }
 
@@ -33,11 +31,6 @@ public class AccountController {
     @RequestMapping(path = "/accounts/{userId}", method = RequestMethod.GET)
     public Account getAccount(@PathVariable Long userId) {
         return dao.getAccount(userId);
-    }
-
-    @RequestMapping(path = "/transfer", method = RequestMethod.POST)
-    public Transfer createTransfer(@RequestBody Transfer newTransfer) {
-        return transferDao.create(newTransfer);
     }
 
     @RequestMapping(path = "/users", method = RequestMethod.GET)
