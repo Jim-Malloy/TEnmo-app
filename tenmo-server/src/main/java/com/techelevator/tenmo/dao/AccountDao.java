@@ -9,5 +9,6 @@ public interface AccountDao {
 
     List<Account> list();
     Account getAccount(Long userId);
+
     void update(Account updatedAccount, long fromId);
 }

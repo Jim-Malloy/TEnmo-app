@@ -100,4 +100,16 @@ public class ConsoleService {
 		}
 		return amount;
 	}
+
+	public Integer getTransferIdInput() {
+		System.out.print("Please enter transfer ID to view details (0 to cancel): ");
+		String input = in.nextLine();
+		Integer transferId = null;
+		try {
+			transferId = Integer.parseInt(input);
+		} catch (NumberFormatException ex) {
+			out.println(System.lineSeparator() + "*** " + transferId + " is not valid ***" + System.lineSeparator());
+		}
+		return transferId;
+	}
 }

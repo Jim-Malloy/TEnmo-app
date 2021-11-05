@@ -3,6 +3,7 @@ package com.techelevator.tenmo.controller;
 import com.techelevator.tenmo.dao.JdbcTransferDao;
 import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.TransferRecord;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class TransferController {
     }
 
     @RequestMapping(path = "", method = RequestMethod.POST)
-    public Transfer createTransfer(@RequestBody Transfer newTransfer) {
+    public TransferRecord createTransfer(@RequestBody TransferRecord newTransfer) {
         return transferDao.create(newTransfer);
     }
 
@@ -27,8 +28,13 @@ public class TransferController {
         return transferDao.getTransferFrom(accountTo);
     }
 
-    @RequestMapping(path = "/request", method = RequestMethod.GET)
-    public List<Transfer> requestTransfer(@RequestParam String username) {
-        return transferDao.getRequestTransfer(username);
+    @RequestMapping(path = "/to", method = RequestMethod.GET)
+    public List<Transfer> receiveTransfer(@RequestParam int accountFrom) {
+        return transferDao.getTransferTo(accountFrom);
+    }
+
+    @RequestMapping(path = "/{id}", method = RequestMethod.GET)
+    public Transfer getById(@PathVariable int id) {
+        return transferDao.getById(id);
     }
 }

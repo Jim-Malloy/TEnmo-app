@@ -11,8 +11,6 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
-import java.math.BigDecimal;
-
 
 public class App {
 
@@ -94,9 +92,43 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		System.out.println("-------------------------------------------");
 		System.out.println("Transfers ID  From/To          Amount");
 		System.out.println("-------------------------------------------");
-		Transfer transfer = restTemplate.getForObject(API_BASE_URL + "send?username=" +
-				currentUser.getUser().getUsername(), Transfer.class);
 
+		try {
+			Account currentAccount = restTemplate.getForObject(API_BASE_URL + "accounts/" +
+							currentUser.getUser().getId(), Account.class);
+			Transfer[] transferFrom = restTemplate.getForObject(API_BASE_URL + "transfer/from?accountTo=" +
+							currentAccount.getAccountId(), Transfer[].class);
+
+			Transfer[] transferTo = restTemplate.getForObject(API_BASE_URL + "transfer/to?accountFrom=" +
+					currentAccount.getAccountId(), Transfer[].class);
+
+
+			if (transferFrom != null && transferTo != null) {
+				for (Transfer newTransfer : transferFrom) {
+					System.out.println(newTransfer.getTransferId() + "        From: " +
+							newTransfer.getFromUsername() + "      $ " + newTransfer.getAmount());
+				}
+
+				for (Transfer newTransfer : transferTo) {
+					System.out.println(newTransfer.getTransferId() + "        To: " +
+							newTransfer.getToUsername() + "      $ " + newTransfer.getAmount());
+				}
+			}
+
+		} catch (RestClientResponseException | ResourceAccessException ex) {
+			System.out.println("An error occurred!");
+		}
+
+		System.out.println("-----------------");
+		Integer transferIdInput = console.getTransferIdInput();
+		System.out.println();
+
+		Transfer transfer = restTemplate.getForObject(API_BASE_URL + "transfer/" + transferIdInput, Transfer.class);
+
+		System.out.println("--------------------------------------------");
+		System.out.println("Transfer Details");
+		System.out.println("--------------------------------------------");
+		System.out.println(transfer);
 		
 	}
 
@@ -154,15 +186,15 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 
 			restTemplate.put(API_BASE_URL + "accounts/" + toUserId, entity);
 
-			Transfer newTransfer = new Transfer();
+			TransferRecord newTransfer = new TransferRecord();
 			newTransfer.setTransferTypeId(2);
 			newTransfer.setTransferStatusId(2);
 			newTransfer.setAccountFrom(fromAccount.getAccountId());
 			newTransfer.setAccountTo(toAccount.getAccountId());
 			newTransfer.setAmount(amount);
 
-			HttpEntity<Transfer> newEntity = new HttpEntity<>(newTransfer, headers);
-			restTemplate.postForObject(API_BASE_URL + "transfer", newEntity, Transfer.class);
+			HttpEntity<TransferRecord> newEntity = new HttpEntity<>(newTransfer, headers);
+			restTemplate.postForObject(API_BASE_URL + "transfer", newEntity, TransferRecord.class);
 
 		} catch (RestClientResponseException | ResourceAccessException ex) {
 			System.out.println("An error occurred!");
